@@ -23,6 +23,8 @@ metadata <- read.csv("study_pages.csv") %>%
             filter(!(script_name %in% rmd_files$files) | update == "Y")
 
 
+str(metadata$release_breaks)
+
 # Create Markdown scripts -----------------------------------------------------------------------------------------
 if(nrow(metadata > 0)){
    for(i in 1:nrow(metadata)){

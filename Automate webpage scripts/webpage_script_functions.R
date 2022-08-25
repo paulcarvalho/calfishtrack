@@ -191,6 +191,7 @@ create_fish_release <- function(release_groups, release_breaks){
    if(!(is.na(release_breaks))){
       rel_groups <- trimws(unlist(strsplit(release_groups, split = ",")), which = "both")
       rel_breaks <- trimws(unlist(strsplit(release_breaks, split = ",")), which = "both")
+      rel_breaks <- as.character(as.POSIXct(rel_breaks, format = "%m/%d/%Y %H:%M:%S", tz = "Etc/GMT+8"))
       
       fish_release2 <- paste0("   detects_study$Release <- ", '"', rel_groups[1], '"')
       
