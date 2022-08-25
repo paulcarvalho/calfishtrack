@@ -702,7 +702,7 @@ create_detection_figures <- function(release_region){
                                   '                                                            "CVP_Trash_Rack_1", "CVP_Tank", "SWP_intake",',
                                   '                                                            "Clifton_Court_Intake_Canal")))',
                                   '',
-                                  '  tagcount1 <- reshape2::dcast(tagcount, Date ~ Location, drop = FALSE)',
+                                  '  tagcount1 <- reshape2::dcast(tagcount1, Date ~ Location, drop = FALSE)',
                                   '',
                                   '  daterange1 <- merge(daterange, tagcount1, all.x=T)',
                                   '  daterange1[is.na(daterange1)] <- 0',
