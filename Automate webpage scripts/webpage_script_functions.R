@@ -97,7 +97,7 @@ create_header <- function(study_name, study_year, template_file){
 }
 
 # Create r code chunk that downloads study detections and adds project status
-create_proj_status <- function(study){
+create_proj_status <- function(study, release_time = NA){
    project_status1 <- paste("",
                             "***",
                             "## _1. Project Status_",
@@ -132,27 +132,40 @@ create_proj_status <- function(study){
                             '   mutate(DateTime_PST = as.POSIXct(DateTime_PST, format = "%Y-%m-%d %H:%M:%S", tz="Etc/GMT+8"),',
                             '          release_time = as.POSIXct(RelDT, format = "%Y-%m-%d %H:%M:%S", tz="Etc/GMT+8")) %>%',
                             '   rename(., weight=Weight, length=Length, release_rkm=Rel_rkm, release_location=Rel_loc, river_km=rkm)',
-                            "",
-                            'latest <- read.csv("latest_download.csv", stringsAsFactors = F)$x',
-                            "",
-                            "##################################################################################################################",
-                            '#### TO RUN THE FOLLOWING CODE CHUNKS FROM HERE ON DOWN USING R ERDDAP, UN-COMMENT THESE NEXT 9 LINES OF CODE ####',
-                            '##################################################################################################################',
-                            "# cache_delete_all()",
-                            paste0("# query = paste(", "'&'", ",'Study_ID',", "'", "=", '"', "'", ", study, ", "'", '"', "'", ", sep = ", "''", ")"),
-                            '# datafile=URLencode(paste("https://oceanview.pfeg.noaa.gov/erddap/tabledap/","FEDcalFishTrack",".csv?",query,sep = ""))',
-                            '# options(url.method = "libcurl", download.file.method = "libcurl", timeout = 180)',
-                            '# detects_study <- data.frame(read.csv(datafile,row.names = NULL, stringsAsFactors = F))',
-                            '# detects_study <- detects_study[-1,]',
-                            '# detects_study$DateTime_PST <- as.POSIXct(detects_study$local_time, format = "%Y-%m-%d %H:%M:%S", "Etc/GMT+8")',
-                            '# detects_study$release_time <- as.POSIXct(detects_study$release_time, format = "%Y-%m-%d %H:%M:%S", "Etc/GMT+8")',
-                            '# detects_study$river_km <- as.numeric(detects_study$river_km)',
-                            '##################################################################################################################',
-                            "",
-                            "```",
                             sep = "\n")
    
-   project_status3 <- paste("",
+   if(!is.na(release_time)){
+     operator <- substr(release_time, 1, 1)
+     time     <- substr(release_time, 3, str_length(release_time))
+   
+     project_status3 <- paste("",
+                              paste0("detects_study <- detects_study %>% filter(release_time ", operator, " as.POSIXct('", time, "'))"),
+                              sep = "\n")  
+   } else {
+     project_status3 <- paste("", sep = "\n")
+   }
+   
+   project_status4 <- paste( "",
+                             'latest <- read.csv("latest_download.csv", stringsAsFactors = F)$x',
+                             "",
+                             "##################################################################################################################",
+                             '#### TO RUN THE FOLLOWING CODE CHUNKS FROM HERE ON DOWN USING R ERDDAP, UN-COMMENT THESE NEXT 9 LINES OF CODE ####',
+                             '##################################################################################################################',
+                             "# cache_delete_all()",
+                             paste0("# query = paste(", "'&'", ",'Study_ID',", "'", "=", '"', "'", ", study, ", "'", '"', "'", ", sep = ", "''", ")"),
+                             '# datafile=URLencode(paste("https://oceanview.pfeg.noaa.gov/erddap/tabledap/","FEDcalFishTrack",".csv?",query,sep = ""))',
+                             '# options(url.method = "libcurl", download.file.method = "libcurl", timeout = 180)',
+                             '# detects_study <- data.frame(read.csv(datafile,row.names = NULL, stringsAsFactors = F))',
+                             '# detects_study <- detects_study[-1,]',
+                             '# detects_study$DateTime_PST <- as.POSIXct(detects_study$local_time, format = "%Y-%m-%d %H:%M:%S", "Etc/GMT+8")',
+                             '# detects_study$release_time <- as.POSIXct(detects_study$release_time, format = "%Y-%m-%d %H:%M:%S", "Etc/GMT+8")',
+                             '# detects_study$river_km <- as.numeric(detects_study$river_km)',
+                             '##################################################################################################################',
+                             "",
+                             "```",
+                             sep = "\n")
+   
+   project_status5 <- paste("",
                             '***`r if (nrow(detects_study) == 0){ anicon::nia("Study has not yet begun", size = 1, colour = "red")',
                             '}else if (min(detects_study$release_time) > Sys.time()){ anicon::nia("Study has not yet begun", size = 1, colour = "red")',
                             '}else if (max(as.Date(detects_study$release_time)+(as.numeric(detects_study$tag_life)*1.5)) < Sys.Date()) { anicon::nia(paste("Study is complete, all tags are no longer active as of",max(as.Date(detects_study$release_time)+(as.numeric(detects_study$tag_life)*1.5))), size = 1, colour = "red")',
@@ -164,6 +177,8 @@ create_proj_status <- function(study){
    project_status <- paste(project_status1,
                            project_status2,
                            project_status3,
+                           project_status4,
+                           project_status5,
                            sep = "\n")
    
    return(project_status)   
@@ -1312,7 +1327,7 @@ create_survival_tables <- function(release_region, georgiana){
    }
    
    # Delta survival
-   if(release_region >= 1 & release_region <= 4){
+   if(release_region >= 1 & release_region <= 3){
       table_count <- table_count + 1
       surv_tables_tmp <- paste('```{r print table of through-Delta survival, message = FALSE, results= "asis", warning=FALSE}',
                                '',
