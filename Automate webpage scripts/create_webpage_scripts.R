@@ -9,9 +9,8 @@ rm(list = ls())
 # Load libraries --------------------------------------------------------------------------------------------------
 library(tidyverse)
 
-
-# Set working directory -------------------------------------------------------------------------------------------
-
+# Set working directory ---------------------------------------------------
+setwd("C:/Users/field/Desktop/Real-time data massaging/real-time/make study pages")
 
 # Functions -------------------------------------------------------------------------------------------------------
 source("webpage_script_functions.R") # load functions save in separate script
@@ -49,7 +48,7 @@ if(nrow(metadata > 0)){
       study_header  <- create_header(metadata_tmp$study_name, metadata_tmp$study_year, metadata_tmp$study_template)
       
       # Project status
-      project_status <- create_proj_status(metadata_tmp$study_ID, metadata$release_time)
+      project_status <- create_proj_status(metadata_tmp$study_ID, metadata_tmp$release_time)
       
       # Print table with fish release details (R code chunk)
       fish_release <- create_fish_release(metadata_tmp$release_groups, metadata_tmp$release_breaks)
@@ -68,7 +67,7 @@ if(nrow(metadata > 0)){
       
       # Write script to .Rmd file
       write(c(yaml, setup, style, logos, pic, study_header, project_status, fish_release, map, detections_figures, survival_tables, detection_stats),
-            file = paste0(here(), "/", metadata_tmp$script_name),
+            file = metadata_tmp$script_name,
             append = FALSE)
       
       # Print file created
@@ -80,21 +79,8 @@ if(nrow(metadata > 0)){
    }
    
    # Update csv file
-   row.names(metadata) <- NULL
    write.csv(metadata, file = "study_pages.csv", row.names = FALSE)
    
 } else {
    cat('All files in "study_pages.csv" already exist.')
 }
-
-
-
-
-
-
-
-
-
-
-
-
