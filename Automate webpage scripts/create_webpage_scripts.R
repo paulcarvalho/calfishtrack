@@ -7,8 +7,11 @@
 rm(list = ls())
 
 # Load libraries --------------------------------------------------------------------------------------------------
-library(here)
 library(tidyverse)
+
+
+# Set working directory -------------------------------------------------------------------------------------------
+
 
 # Functions -------------------------------------------------------------------------------------------------------
 source("webpage_script_functions.R") # load functions save in separate script
@@ -46,7 +49,7 @@ if(nrow(metadata > 0)){
       study_header  <- create_header(metadata_tmp$study_name, metadata_tmp$study_year, metadata_tmp$study_template)
       
       # Project status
-      project_status <- create_proj_status(metadata_tmp$study_ID)
+      project_status <- create_proj_status(metadata_tmp$study_ID, metadata$release_time)
       
       # Print table with fish release details (R code chunk)
       fish_release <- create_fish_release(metadata_tmp$release_groups, metadata_tmp$release_breaks)

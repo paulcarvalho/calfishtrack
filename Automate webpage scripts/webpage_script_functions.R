@@ -97,7 +97,7 @@ create_header <- function(study_name, study_year, template_file){
 }
 
 # Create r code chunk that downloads study detections and adds project status
-create_proj_status <- function(study){
+create_proj_status <- function(study, release_time = NULL){
    project_status1 <- paste("",
                             "***",
                             "## _1. Project Status_",
@@ -1312,7 +1312,7 @@ create_survival_tables <- function(release_region, georgiana){
    }
    
    # Delta survival
-   if(release_region >= 1 & release_region <= 4){
+   if(release_region >= 1 & release_region <= 3){
       table_count <- table_count + 1
       surv_tables_tmp <- paste('```{r print table of through-Delta survival, message = FALSE, results= "asis", warning=FALSE}',
                                '',
